@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore and capture output
+        run: |
+          # Restore and capture all output to restore.log
+          dotnet restore RealTimeDashboard.sln 2>&1 | tee restore.log
+          # Fail the job if any NuGet warnings (NUxxxx) are present — enforces package alignment
+          if grep -Eo 'NU[0-9]{4}' restore.log; then
+            echo "NuGet package warnings detected in restore output. Failing CI to enforce package alignment."
+            cat restore.log
+            exit 1
+          fi
+
+      - name: Build solution
+        run: dotnet build RealTimeDashboard.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test RealTimeDashboard.sln --no-build --verbosity normal
+
+      - name: Report vulnerable packages (informational)
+        run: |
+          echo "Checking vulnerable packages (dotnet list package --vulnerable)"
+          dotnet list package --vulnerable || true

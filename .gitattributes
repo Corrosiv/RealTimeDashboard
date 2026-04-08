@@ -1,0 +1,25 @@
+# Ensure consistent EOL and attributes for repository
+* text=auto eol=lf
+
+# Force CRLF for common Visual Studio project files
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
+
+# Treat common binaries as binary
+*.png binary
+*.jpg binary	
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.dll binary
+*.exe binary
+
+# Normalize line endings for source files (CRLF on Windows)
+*.cs text eol=crlf
+*.vb text eol=crlf
+*.fs text eol=crlf
+
+# Docs use LF
+*.md text eol=lf
