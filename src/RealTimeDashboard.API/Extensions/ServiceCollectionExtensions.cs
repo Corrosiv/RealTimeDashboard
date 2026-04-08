@@ -9,6 +9,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RealTimeDashboard.API.Realtime.WebSocketConnectionManager>();
         services.AddSingleton<RealTimeDashboard.API.Realtime.WebSocketHandler>();
         services.AddSingleton<RealTimeDashboard.API.Services.ActivityFeedService>();
+
+        // Persistence adapters: map Core persistence interface to EF adapter
+        services.AddScoped<FinanceTracker.Core.Interfaces.ITransactionStore, RealTimeDashboard.API.Infrastructure.TransactionStore>();
+
         return services;
     }
 }
