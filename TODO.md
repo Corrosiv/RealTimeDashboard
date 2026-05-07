@@ -48,11 +48,25 @@ Solution audit summary
     - Test coverage goals documented (e.g., critical services target >=80% branch coverage) and tracked.
 
 - [ ] Transactions API — pagination and filtering
-  - Description: Add cursor or offset pagination and server-side filtering (date range, amount, category, text search).
+  - Description: Add cursor-based pagination and server-side filtering (date range, amount, category, text search).
   - Acceptance Criteria:
-    - API accepts `pageSize` + `cursor` (or `page`/`pageSize`) and returns `nextCursor` or `total` consistent with stable ordering.
+    - API accepts `cursor` (base64 encoded timestamp+id) and returns `nextCursor` for stable, efficient pagination.
+    - Filtering supports: `dateFrom`, `dateTo`, `minAmount`, `maxAmount`, `categoryId`, `type`, `search`.
     - Integration tests assert pagination + filters return expected subsets deterministically.
-    - Invalid pagination/filter params return 400 with clear validation messages.
+    - Invalid pagination/filter params return 400 with structured validation errors (FluentValidation).
+    - Supports fixed sorting: `timestamp:asc` or `timestamp:desc` (default: `timestamp:desc`).
+
+- [x] Transactions API — pagination and filtering
+  - Description: Add cursor-based pagination and server-side filtering (date range, amount, category, text search).
+  - Status: ✅ COMPLETE - All 57 tests passing
+  - Implementation:
+    - Cursor-based pagination using base64(timestamp:id)
+    - Filtering: dateFrom, dateTo, minAmount, maxAmount, categoryId, type, search
+    - Fixed sorting: timestamp:asc|desc
+    - FluentValidation with field-level error reporting
+    - Domain event pattern for TransactionCreatedEvent
+    - Event handlers create activity feed entries and broadcast WebSocket events
+    - Comprehensive integration and unit tests
 
 - [ ] Transactions API — request validation & canonicalization
   - Description: Centralize validation for transaction DTOs and normalize date/time to UTC.

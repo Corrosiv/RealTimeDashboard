@@ -4,29 +4,55 @@ using Microsoft.Extensions.Hosting;
 using FinanceTracker.Core.Services;
 using RealTimeDashboard.API.Extensions;
 using RealTimeDashboard.API.Middleware;
+using RealTimeDashboard.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Services registration
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
+
+// Database
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=finance.db";
+builder.Services.AddDbContext<FinanceDbContext>(options =>
+    options.UseSqlite(connectionString)
+);
 
 // Register shared FinanceTracker core implementations
-// (Core project is referenced by the API project)
 builder.Services.AddScoped<ITransactionProcessor, TransactionProcessor>();
 builder.Services.AddScoped<IBudgetCalculator, BudgetCalculator>();
 
-// Register API-specific services (websocket, activity feed)
+// Register API-specific services (websocket, activity feed, transactions)
 builder.Services.AddDashboardServices();
 
-// Ensure EF Core SQLite services are available (registered in ServiceCollectionExtensions normally)
+// CORS (if needed for frontend)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
-// Basic middleware
+// Apply migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<FinanceDbContext>();
+    db.Database.Migrate();
+}
+
+// Middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseCors();
 
 app.UseRouting();
 app.MapControllers();
 
 app.Run();
+
+
