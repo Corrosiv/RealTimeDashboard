@@ -20,28 +20,28 @@ Solution audit summary
     - Integration tests exercising CSV upload and WebSocket flows are present and passing.
     - CI builds and runs tests (existing `.github/workflows/ci.yml`).
 
-- [ ] CSV import — row-level validation & structured error reporting
+- [x] CSV import — row-level validation & structured error reporting
   - Description: Provide per-row validation results and a structured API response for import failures.
   - Acceptance Criteria:
     - `CsvImportResult` includes per-row objects with `lineNumber`, `field`, and `message`/`code`.
     - Integration test uploads a CSV with multiple bad rows and asserts all row errors are reported and no invalid transactions are persisted.
     - HTTP API returns 400 with structured payload for malformed files and 200 with partial results when configured.
 
-- [ ] CSV import — robust parsing (quoted fields, embedded newlines, missing columns)
+- [x] CSV import — robust parsing (quoted fields, embedded newlines, missing columns)
   - Description: Harden CSV parser to handle common malformed formats and large files safely.
   - Acceptance Criteria:
     - Unit tests cover quoted fields with commas, embedded newlines, and missing/extra columns.
     - Rows missing required columns are marked as errors in import results (not silently dropped).
     - Streaming parser handles large files (e.g., 50k rows) without excessive memory usage; document threshold in README.
 
-- [ ] CSV import — duplicate detection & idempotency
+- [x] CSV import — duplicate detection & idempotency
   - Description: Detect duplicates on import and support skip/merge behavior to make imports idempotent.
   - Acceptance Criteria:
     - Import result reports duplicates detected using configurable key(s) (e.g., date+amount+description).
     - Endpoint supports `onDuplicate=skip|merge|error` and behavior validated by unit/integration tests.
     - Re-uploading the same file with `skip` does not create duplicate transactions (integration test).
 
-- [~] Tests: increase coverage for edge cases and failure modes
+- [x] Tests: increase coverage for edge cases and failure modes
   - Description: Add targeted unit and integration tests for parsing, concurrency, and WebSocket reconnections.
   - Acceptance Criteria:
     - New tests cover CSV edge cases, concurrent uploads (TransactionStore), and WebSocket reconnect/replay.
