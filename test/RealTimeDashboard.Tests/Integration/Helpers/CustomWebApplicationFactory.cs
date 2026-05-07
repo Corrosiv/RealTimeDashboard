@@ -8,27 +8,48 @@ namespace RealTimeDashboard.Tests.Integration.Helpers;
 
 public class CustomWebApplicationFactory<TEntryPoint> : WebApplicationFactory<TEntryPoint> where TEntryPoint : class
 {
+    private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"rtd-tests-{Guid.NewGuid():N}.db");
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         // Hook for overriding services in integration tests.
         builder.ConfigureServices(services =>
         {
-            // Replace FinanceDbContext with SQLite in-memory per-test
-            // Note: the API registers FinanceDbContext; here we remove that registration by searching descriptors.
+            // Replace FinanceDbContext with SQLite using a unique temporary database file per factory instance
+            // This ensures each test class/factory gets an isolated database, preventing "table already exists" errors
             var descriptors = services.Where(d => d.ServiceType?.FullName?.Contains("FinanceDbContext") == true).ToList();
             foreach (var d in descriptors) services.Remove(d);
 
-            var connection = new Microsoft.Data.Sqlite.SqliteConnection("DataSource=:memory:");
-            connection.Open();
-            services.AddDbContext<RealTimeDashboard.API.Infrastructure.FinanceDbContext>(options => options.UseSqlite(connection));
+            var connectionString = $"Data Source={_dbPath}";
+            services.AddDbContext<RealTimeDashboard.API.Infrastructure.FinanceDbContext>(options =>
+                options.UseSqlite(connectionString)
+            );
 
-            // Ensure DB is created when host starts
+            // Apply migrations once when the host starts (Program.cs will call Migrate() again, which is idempotent)
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<RealTimeDashboard.API.Infrastructure.FinanceDbContext>();
-            db.Database.EnsureCreated();
+            db.Database.Migrate();
         });
 
         return base.CreateHost(builder);
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        // Clean up the temporary database file when the factory is disposed
+        try
+        {
+            if (File.Exists(_dbPath))
+            {
+                File.Delete(_dbPath);
+            }
+        }
+        catch
+        {
+            // Ignore cleanup failures (file may be locked or already deleted)
+        }
+
+        await base.DisposeAsync();
     }
 }

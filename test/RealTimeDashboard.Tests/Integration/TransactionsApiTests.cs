@@ -13,18 +13,18 @@ namespace RealTimeDashboard.Tests.Integration;
 /// <summary>
 /// Integration tests for the Transactions API.
 /// Tests pagination, filtering, sorting, and CRUD operations.
+/// Each test gets its own factory instance to ensure database isolation.
 /// </summary>
-public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Program>>
+public class TransactionsApiTests
 {
-    private readonly CustomWebApplicationFactory<Program> _factory;
     private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public TransactionsApiTests(CustomWebApplicationFactory<Program> factory)
+    private CustomWebApplicationFactory<Program> CreateFactory()
     {
-        _factory = factory;
+        return new CustomWebApplicationFactory<Program>();
     }
 
     #region Pagination Tests
@@ -32,7 +32,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_FirstPage_ReturnsDefaultLimit()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         // Create some test transactions
         await CreateTestTransactions(client, 25);
@@ -53,7 +54,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_WithCursor_FetchesNextPage()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         // Create test transactions
         await CreateTestTransactions(client, 50);
@@ -81,7 +83,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_LimitExceedsMax_Returns400()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var response = await client.GetAsync("/api/transactions?limit=101");
 
@@ -93,7 +96,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_InvalidCursor_StartsFromBeginning()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         await CreateTestTransactions(client, 10);
 
@@ -114,7 +118,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_FilterByDateRange_ReturnsMatchingTransactions()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var now = DateTime.UtcNow;
         var yesterday = now.AddDays(-1);
@@ -159,7 +164,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_FilterByAmount_ReturnsMatchingTransactions()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         await CreateTransaction(client, new CreateTransactionRequest
         {
@@ -193,7 +199,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_FilterBySearch_ReturnsMatchingDescriptions()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         await CreateTransaction(client, new CreateTransactionRequest
         {
@@ -229,7 +236,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_DateFromAfterDateTo_Returns400()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var now = DateTime.UtcNow;
         var future = now.AddDays(1);
@@ -249,7 +257,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_SortDescending_ReturnsNewestFirst()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var baseTime = DateTime.UtcNow;
         await CreateTransaction(client, new CreateTransactionRequest
@@ -286,7 +295,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactions_InvalidSort_Returns400()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var response = await client.GetAsync("/api/transactions?sort=invalid");
 
@@ -300,7 +310,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task CreateTransaction_ValidRequest_Returns201Created()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var request = new CreateTransactionRequest
         {
@@ -327,7 +338,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task CreateTransaction_InvalidAmount_Returns400()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var request = new CreateTransactionRequest
         {
@@ -348,7 +360,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task CreateTransaction_FutureTimestamp_Returns400()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var request = new CreateTransactionRequest
         {
@@ -369,7 +382,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task CreateTransaction_MissingCreatedBy_Returns400()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var request = new CreateTransactionRequest
         {
@@ -388,7 +402,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactionById_ExistingId_ReturnsTransaction()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var createResponse = await CreateTransaction(client, new CreateTransactionRequest
         {
@@ -416,7 +431,8 @@ public class TransactionsApiTests : IClassFixture<CustomWebApplicationFactory<Pr
     [Fact]
     public async Task GetTransactionById_NonExistentId_Returns404()
     {
-        using var client = _factory.CreateClient();
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
 
         var response = await client.GetAsync("/api/transactions/99999");
 

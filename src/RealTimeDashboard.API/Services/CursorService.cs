@@ -9,13 +9,15 @@ namespace RealTimeDashboard.API.Services;
 /// </summary>
 public class CursorService
 {
+    private const char Separator = '|';
+
     /// <summary>
     /// Encodes a transaction's position into a base64 cursor string.
-    /// Format: base64(timestamp:id)
+    /// Format: base64(timestamp|id)
     /// </summary>
     public string EncodeCursor(DateTime timestamp, int id)
     {
-        var cursorValue = $"{timestamp:O}:{id}";
+        var cursorValue = $"{timestamp:O}{Separator}{id}";
         var bytes = Encoding.UTF8.GetBytes(cursorValue);
         return Convert.ToBase64String(bytes);
     }
@@ -30,12 +32,12 @@ public class CursorService
         {
             var bytes = Convert.FromBase64String(cursor);
             var cursorValue = Encoding.UTF8.GetString(bytes);
-            var parts = cursorValue.Split(':');
+            var parts = cursorValue.Split(Separator);
 
             if (parts.Length != 2)
                 return null;
 
-            if (!DateTime.TryParse(parts[0], out var timestamp) || !int.TryParse(parts[1], out var id))
+            if (!DateTime.TryParse(parts[0], null, System.Globalization.DateTimeStyles.RoundtripKind, out var timestamp) || !int.TryParse(parts[1], out var id))
                 return null;
 
             return (timestamp, id);
