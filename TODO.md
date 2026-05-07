@@ -47,15 +47,6 @@ Solution audit summary
     - New tests cover CSV edge cases, concurrent uploads (TransactionStore), and WebSocket reconnect/replay.
     - Test coverage goals documented (e.g., critical services target >=80% branch coverage) and tracked.
 
-- [ ] Transactions API — pagination and filtering
-  - Description: Add cursor-based pagination and server-side filtering (date range, amount, category, text search).
-  - Acceptance Criteria:
-    - API accepts `cursor` (base64 encoded timestamp+id) and returns `nextCursor` for stable, efficient pagination.
-    - Filtering supports: `dateFrom`, `dateTo`, `minAmount`, `maxAmount`, `categoryId`, `type`, `search`.
-    - Integration tests assert pagination + filters return expected subsets deterministically.
-    - Invalid pagination/filter params return 400 with structured validation errors (FluentValidation).
-    - Supports fixed sorting: `timestamp:asc` or `timestamp:desc` (default: `timestamp:desc`).
-
 - [x] Transactions API — pagination and filtering
   - Description: Add cursor-based pagination and server-side filtering (date range, amount, category, text search).
   - Status: ✅ COMPLETE - All 57 tests passing
@@ -71,7 +62,7 @@ Solution audit summary
 - [ ] Transactions API — request validation & canonicalization
   - Description: Centralize validation for transaction DTOs and normalize date/time to UTC.
   - Acceptance Criteria:
-    - Validation attributes or FluentValidation rules applied; tests assert bad payloads yield 400 with structured errors.
+    - FluentValidation rules applied; tests assert bad payloads yield 400 with structured errors.
     - Transaction creation is atomic; returned resource matches persisted DB state in an integration test.
     - API docs state date/time handling (UTC) and currency expectations.
 

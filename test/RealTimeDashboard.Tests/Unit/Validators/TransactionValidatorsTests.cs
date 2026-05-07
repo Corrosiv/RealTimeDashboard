@@ -215,7 +215,7 @@ public class CreateTransactionRequestValidatorTests
         var result = await _validator.TestValidateAsync(request);
 
         result.ShouldHaveValidationErrorFor(x => x.Currency)
-            .WithErrorMessage("Currency code must be 2-5 characters (e.g., 'USD', 'EUR').");
+            .WithErrorMessage("Currency code must be 2-5 characters (ISO 4217 format).");
     }
 
     [Fact]

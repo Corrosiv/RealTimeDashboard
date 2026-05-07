@@ -21,19 +21,22 @@ public class TransactionsController : ControllerBase
     private readonly IValidator<TransactionQueryRequest> _queryValidator;
     private readonly IValidator<CreateTransactionRequest> _createValidator;
     private readonly IDomainEventPublisher _eventPublisher;
+    private readonly RequestCanonicalizationService _canonicalizationService;
 
     public TransactionsController(
         TransactionQueryService queryService,
         FinanceDbContext db,
         IValidator<TransactionQueryRequest> queryValidator,
         IValidator<CreateTransactionRequest> createValidator,
-        IDomainEventPublisher eventPublisher)
+        IDomainEventPublisher eventPublisher,
+        RequestCanonicalizationService canonicalizationService)
     {
         _queryService = queryService;
         _db = db;
         _queryValidator = queryValidator;
         _createValidator = createValidator;
         _eventPublisher = eventPublisher;
+        _canonicalizationService = canonicalizationService;
     }
 
     /// <summary>
@@ -74,6 +77,9 @@ public class TransactionsController : ControllerBase
                     )
             });
         }
+
+        // Canonicalize request (normalize dates, trim search, etc.)
+        _canonicalizationService.CanonicalizeTransactionQueryRequest(request);
 
         try
         {
@@ -124,14 +130,26 @@ public class TransactionsController : ControllerBase
 
     /// <summary>
     /// Creates a new transaction.
-    /// Validates input and emits a domain event to trigger metrics updates and activity feed entries.
+    /// 
+    /// Pipeline:
+    /// 1. Request is validated (FluentValidation)
+    /// 2. Request is canonicalized (DateTime normalization, currency uppercase, text trimming, amount rounding)
+    /// 3. Transaction domain entity is created
+    /// 4. Entity is persisted atomically
+    /// 5. Domain event is published for handlers (activity feed, metrics, WebSocket broadcast)
+    /// 
+    /// Notes:
+    /// - CreatedAt is always server-set and cannot be provided by clients
+    /// - Source defaults to "Manual" during canonicalization if not provided
+    /// - Amount is rounded to 2 decimal places
+    /// - Currency must be a valid ISO 4217 code
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<TransactionDto>> CreateTransaction(
         [FromBody] CreateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        // Validate request
+        // 1. Validate request structure
         var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
@@ -149,9 +167,12 @@ public class TransactionsController : ControllerBase
             });
         }
 
+        // 2. Canonicalize request (normalize/clean all fields)
+        _canonicalizationService.CanonicalizeCreateTransactionRequest(request);
+
         try
         {
-            // Create transaction entity
+            // 3. Create transaction entity from canonicalized request
             var transaction = new Transaction
             {
                 Timestamp = request.Timestamp,
@@ -165,11 +186,11 @@ public class TransactionsController : ControllerBase
                 Scope = "default"
             };
 
-            // Persist
+            // 4. Persist atomically
             _db.Transactions.Add(transaction);
             await _db.SaveChangesAsync(cancellationToken);
 
-            // Publish domain event for handlers (metrics, activity feed, etc.)
+            // 5. Publish domain event for handlers (metrics, activity feed, WebSocket broadcast)
             var @event = new TransactionCreatedEvent
             {
                 TransactionId = transaction.Id,
@@ -181,7 +202,7 @@ public class TransactionsController : ControllerBase
             };
             await _eventPublisher.PublishAsync(@event, cancellationToken);
 
-            // Return created resource
+            // Return created resource (matches persisted state)
             var dto = new TransactionDto(
                 transaction.Id,
                 transaction.Timestamp,

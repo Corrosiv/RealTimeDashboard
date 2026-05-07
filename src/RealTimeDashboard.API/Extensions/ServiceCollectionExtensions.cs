@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         // Transaction API services
         services.AddScoped<TransactionQueryService>();
         services.AddScoped<CursorService>();
+        services.AddScoped<RequestCanonicalizationService>();
 
         // Event handlers
         services.AddScoped<TransactionCreatedEventHandler>();

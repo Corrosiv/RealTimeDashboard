@@ -1,11 +1,15 @@
 using FluentValidation;
 using RealTimeDashboard.API.DTOs;
+using RealTimeDashboard.API.Infrastructure;
 
 namespace RealTimeDashboard.API.Validators;
 
 /// <summary>
 /// Validator for CreateTransactionRequest.
 /// Ensures new transactions have valid data before persistence.
+/// 
+/// Validation occurs BEFORE canonicalization, so checks should be structural/format-based.
+/// Canonicalization (trimming, normalization, rounding) happens after validation passes.
 /// </summary>
 public class CreateTransactionRequestValidator : AbstractValidator<CreateTransactionRequest>
 {
@@ -22,10 +26,18 @@ public class CreateTransactionRequestValidator : AbstractValidator<CreateTransac
             .NotEmpty().WithMessage("Amount is required.")
             .NotEqual(0).WithMessage("Amount cannot be zero.");
 
-        // Currency validation
+        // Currency validation - must be a valid ISO 4217 code
         RuleFor(x => x.Currency)
             .NotEmpty().WithMessage("Currency is required.")
-            .Length(2, 5).WithMessage("Currency code must be 2-5 characters (e.g., 'USD', 'EUR').");
+            .Length(2, 5).WithMessage("Currency code must be 2-5 characters (ISO 4217 format).")
+            .Custom((currency, context) =>
+            {
+                if (!CurrencyCodes.IsValid(currency))
+                {
+                    context.AddFailure(nameof(CreateTransactionRequest.Currency),
+                        $"'{currency}' is not a valid ISO 4217 currency code.");
+                }
+            });
 
         // Description validation
         RuleFor(x => x.Description)
