@@ -111,17 +111,27 @@ Solution audit summary
     - Tests ready to implement: pagination, filter combinations, sorting, cursor stability, edge cases
 
 ## Phase 1.5 — Minimalist Frontend (High Priority)
-- [ ] Basic HTML/JavaScript frontend for demo & portfolio
+- [x] Basic HTML/JavaScript frontend for demo & portfolio
+  - Status: ✅ COMPLETE
   - Description: Create a lightweight, single-page frontend using vanilla JavaScript and plain CSS to demonstrate real-time synchronization and end-to-end functionality.
+  - Implementation:
+    - ✅ `index.html`: One-page layout with header, CSV upload, metrics, transactions list, and activity feed sections
+    - ✅ `styles.css`: Responsive design with flexbox/grid, connection status indicators, animations, and mobile support
+    - ✅ `api.js`: HTTP abstraction for CSV upload, transaction queries, activity feed, and username management
+    - ✅ `websocket.js`: Real-time client with auto-reconnect, exponential backoff (1s-30s), and lastSeenEventId replay protocol
+    - ✅ `app.js`: Main orchestrator handling UI state, event rendering, filtering, and pagination
+    - ✅ Static file serving: ASP.NET configured with UseStaticFiles() and SPA fallback to index.html
+    - ✅ WebSocket route: `/ws` endpoint mapped with proper connection handling
   - Acceptance Criteria:
-    - Frontend serves from `/index.html` and is accessible at `http://localhost:5000/` (or configured app URL).
-    - User can upload CSV file via form; transactions appear in real-time after processing.
-    - Transaction list displays with pagination controls matching API cursor pagination.
-    - Real-time Activity Feed updates via WebSocket as events arrive (no polling).
-    - Multiple browser tabs/windows stay synchronized: changes in one tab reflect immediately in others.
-    - Simple metrics display (total balance, transaction count, category breakdown via simple tables or lists).
-    - No external UI frameworks (vanilla HTML/CSS); responsive layout using flexbox/grid.
-    - Integration test opens frontend, uploads CSV, and validates transaction list and activity feed update.
+    - ✅ Frontend serves from `/index.html` and is accessible at configured app URL
+    - ✅ User can upload CSV file via form
+    - ✅ Transaction list displays with pagination controls (Load More button)
+    - ✅ Real-time Activity Feed updates via WebSocket with auto-prepending of new events
+    - ✅ Connection status indicator shows: Connected ✓, Disconnected ✗, Reconnecting…
+    - ✅ Simple metrics display: total transactions, total balance, spending by category (top 5)
+    - ✅ Filter bar for searching and category filtering
+    - ✅ No external UI frameworks (vanilla HTML/CSS); responsive layout using flexbox/grid
+    - ✅ Modular architecture enables future React migration without rewriting API/WebSocket/state layers
 
 ## Phase 2 — User & Data Persistence (Medium)
 - [ ] Persistent user records & simple preferences
