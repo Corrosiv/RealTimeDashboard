@@ -22,12 +22,12 @@ public class WebSocketConnectionManagerTests
 
         // Act
         _manager.AddSocket(connectionId, mockSocket.Object);
-        var sockets = _manager.GetAll().ToList();
+        var connections = _manager.GetAll().ToList();
 
         // Assert
-        Assert.Single(sockets);
-        Assert.Equal(connectionId, sockets[0].Key);
-        Assert.Same(mockSocket.Object, sockets[0].Value);
+        Assert.Single(connections);
+        Assert.Equal(connectionId, connections[0].Key);
+        Assert.Same(mockSocket.Object, connections[0].Value.Socket);
     }
 
     [Fact]
@@ -109,9 +109,9 @@ public class WebSocketConnectionManagerTests
         _manager.AddSocket("client-1", socket2);
 
         // Assert
-        var sockets = _manager.GetAll().ToList();
-        Assert.Single(sockets);
-        Assert.Same(socket2, sockets[0].Value);
+        var connections = _manager.GetAll().ToList();
+        Assert.Single(connections);
+        Assert.Same(socket2, connections[0].Value.Socket);
     }
 
     [Fact]

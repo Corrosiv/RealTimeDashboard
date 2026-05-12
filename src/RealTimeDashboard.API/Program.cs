@@ -5,6 +5,7 @@ using FinanceTracker.Core.Services;
 using RealTimeDashboard.API.Extensions;
 using RealTimeDashboard.API.Middleware;
 using RealTimeDashboard.API.Infrastructure;
+using RealTimeDashboard.API.Realtime;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<FinanceDbContext>(options =>
     options.UseSqlite(connectionString)
 );
+
+// Configuration binding
+builder.Services.Configure<WebSocketReplayOptions>(
+    builder.Configuration.GetSection("WebSocketReplay"));
 
 // Register shared FinanceTracker core implementations
 builder.Services.AddScoped<ITransactionProcessor, TransactionProcessor>();
@@ -54,5 +59,3 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
-
-

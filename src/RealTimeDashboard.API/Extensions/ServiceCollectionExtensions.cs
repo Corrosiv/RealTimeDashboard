@@ -9,15 +9,22 @@ using RealTimeDashboard.API.Services;
 using RealTimeDashboard.API.Validators;
 using RealTimeDashboard.API.DomainEvents;
 using RealTimeDashboard.API.EventHandlers;
+using RealTimeDashboard.API.Realtime;
+using RealTimeDashboard.API.ActivityFeed;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDashboardServices(this IServiceCollection services)
     {
         // WebSocket services
-        services.AddSingleton<RealTimeDashboard.API.Realtime.WebSocketConnectionManager>();
-        services.AddSingleton<RealTimeDashboard.API.Realtime.WebSocketHandler>();
-        services.AddSingleton<RealTimeDashboard.API.Services.ActivityFeedService>();
+        // Note: WebSocketHandler is scoped because it depends on WebSocketReplayService (scoped)
+        services.AddSingleton<WebSocketConnectionManager>();
+        services.AddScoped<WebSocketHandler>();
+        services.AddSingleton<ActivityFeedService>();
+        services.AddScoped<WebSocketReplayService>();
+
+        // Real-time event publishing (single source of truth for live + replay)
+        services.AddScoped<ActivityEventPublisher>();
 
         // Correctness-critical services (heavy unit testing)
         services.AddScoped<ITransactionHashGenerator, TransactionHashGenerator>();
