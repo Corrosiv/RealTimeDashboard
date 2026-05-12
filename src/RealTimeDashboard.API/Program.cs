@@ -55,7 +55,29 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors();
 
+// Serve static files from wwwroot
+app.UseStaticFiles();
+
+// Map WebSocket endpoint
+app.Map("/ws", async context =>
+{
+    if (context.WebSockets.IsWebSocketRequest)
+    {
+        var websocket = await context.WebSockets.AcceptWebSocketAsync();
+        var handler = context.RequestServices.GetRequiredService<WebSocketHandler>();
+        var connectionId = context.Connection.Id ?? Guid.NewGuid().ToString();
+        await handler.HandleAsync(connectionId, websocket, context.RequestAborted);
+    }
+    else
+    {
+        context.Response.StatusCode = 400;
+    }
+});
+
 app.UseRouting();
 app.MapControllers();
+
+// Fallback to index.html for SPA routing
+app.MapFallbackToFile("index.html");
 
 app.Run();

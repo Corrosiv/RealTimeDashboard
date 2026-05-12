@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealTimeDashboard - Transaction Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>RealTimeDashboard</h1>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot disconnected"></span>
+                    <span class="status-text">Disconnected</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CSV Upload Section -->
+        <section class="section upload-section">
+            <h2>Upload Transactions</h2>
+            <div class="upload-container">
+                <input type="file" id="csvFile" accept=".csv" class="file-input">
+                <button id="uploadBtn" class="btn btn-primary">Upload CSV</button>
+                <div id="uploadStatus" class="upload-status"></div>
+            </div>
+        </section>
+
+        <!-- Metrics Section -->
+        <section class="section metrics-section">
+            <h2>Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Total Transactions</div>
+                    <div class="metric-value" id="metricTransactions">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Balance</div>
+                    <div class="metric-value" id="metricBalance">$0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Spending by Category</div>
+                    <div id="metricCategories" class="metric-table"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions List Section -->
+        <section class="section transactions-section">
+            <h2>Transactions</h2>
+            <div class="filter-bar">
+                <input type="text" id="filterSearch" placeholder="Search description...">
+                <select id="filterCategory" class="filter-select">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div id="transactionsList" class="transactions-list"></div>
+            <div class="pagination">
+                <button id="loadMoreBtn" class="btn btn-secondary" style="display: none;">Load More</button>
+            </div>
+        </section>
+
+        <!-- Activity Feed Section -->
+        <section class="section activity-section">
+            <h2>Activity Feed</h2>
+            <div id="activityFeed" class="activity-feed"></div>
+            <div class="pagination">
+                <button id="loadMoreActivityBtn" class="btn btn-secondary" style="display: none;">Load More Activity</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal for error/info messages -->
+    <div id="messageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="messageTitle">Message</h3>
+                <button class="modal-close" id="messageClose">&times;</button>
+            </div>
+            <div class="modal-body" id="messageBody"></div>
+            <div class="modal-footer">
+                <button id="messageOkBtn" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="websocket.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
