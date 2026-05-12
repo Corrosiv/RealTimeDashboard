@@ -33,6 +33,7 @@ const WebSocketClient = {
      */
     connect: function() {
         try {
+            console.log(`Attempting WebSocket connection to: ${this.url}`);
             this.ws = new WebSocket(this.url);
 
             this.ws.onopen = () => this._onOpen();
@@ -40,7 +41,7 @@ const WebSocketClient = {
             this.ws.onerror = (event) => this._onError(event);
             this.ws.onclose = (event) => this._onClose(event);
         } catch (error) {
-            console.error('WebSocket connection error:', error);
+            console.error('WebSocket connection exception:', error);
             this._scheduleReconnect();
         }
     },
@@ -121,7 +122,7 @@ const WebSocketClient = {
      * WebSocket open handler
      */
     _onOpen: function() {
-        console.log('WebSocket connected');
+        console.log('WebSocket connected successfully');
         this.isConnected = true;
         this.isReconnecting = false;
         this.reconnectAttempts = 0;
@@ -132,17 +133,26 @@ const WebSocketClient = {
         // Send queued messages
         while (this.messageQueue.length > 0) {
             const message = this.messageQueue.shift();
-            this.send(message);
+            try {
+                this.send(message);
+            } catch (err) {
+                console.error('Failed to send queued message:', err);
+                // Re-queue the message
+                this.messageQueue.unshift(message);
+                break;
+            }
         }
 
         // Resume with last seen event ID if available
         if (this.lastSeenEventId) {
+            console.log(`Resuming from event ID: ${this.lastSeenEventId}`);
             this.send({
                 type: 'Resume',
                 payload: { lastSeenEventId: this.lastSeenEventId }
             });
         } else {
             // Initial subscription
+            console.log('Sending initial subscription');
             this.subscribe();
         }
     },
@@ -198,7 +208,11 @@ const WebSocketClient = {
      */
     _onError: function(event) {
         console.error('WebSocket error:', event);
-        this.emit('error', { message: 'WebSocket connection error' });
+        // Don't emit error to UI on every reconnect attempt - that's noisy
+        // Only emit if we've exhausted retries
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            this.emit('error', { message: 'WebSocket connection failed after multiple attempts' });
+        }
     },
 
     /**

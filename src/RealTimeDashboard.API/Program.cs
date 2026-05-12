@@ -7,6 +7,7 @@ using RealTimeDashboard.API.Middleware;
 using RealTimeDashboard.API.Infrastructure;
 using RealTimeDashboard.API.Realtime;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Enable WebSocket support
+var webSocketOptions = new WebSocketOptions()
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+app.UseWebSockets(webSocketOptions);
+
 // Apply migrations on startup
 using (var scope = app.Services.CreateScope())
 {
@@ -58,7 +66,9 @@ app.UseCors();
 // Serve static files from wwwroot
 app.UseStaticFiles();
 
-// Map WebSocket endpoint
+app.UseRouting();
+
+// Map WebSocket endpoint before other endpoint mappings
 app.Map("/ws", async context =>
 {
     if (context.WebSockets.IsWebSocketRequest)
@@ -74,7 +84,6 @@ app.Map("/ws", async context =>
     }
 });
 
-app.UseRouting();
 app.MapControllers();
 
 // Fallback to index.html for SPA routing
