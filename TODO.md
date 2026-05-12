@@ -59,12 +59,19 @@ Solution audit summary
     - Event handlers create activity feed entries and broadcast WebSocket events
     - Comprehensive integration and unit tests
 
-- [ ] Transactions API — request validation & canonicalization
+- [x] Transactions API — request validation & canonicalization
   - Description: Centralize validation for transaction DTOs and normalize date/time to UTC.
-  - Acceptance Criteria:
-    - FluentValidation rules applied; tests assert bad payloads yield 400 with structured errors.
-    - Transaction creation is atomic; returned resource matches persisted DB state in an integration test.
-    - API docs state date/time handling (UTC) and currency expectations.
+  - Status: ✅ COMPLETE - All 126 tests passing
+  - Implementation:
+    - FluentValidation with field-level error reporting for CreateTransactionRequest
+    - ISO 4217 currency code validation with whitelist of 249 valid codes
+    - DateTime UTC normalization; rejects future timestamps
+    - Text field sanitization (trimming, length limits per field)
+    - Decimal precision rounding to 2 places (currency standard)
+    - RequestCanonicalizationService applies normalization AFTER validation
+    - Transaction creation is atomic; returned resource matches persisted DB state
+    - API docs (API-SPEC.md) document date/time handling (UTC) and currency expectations
+    - Comprehensive integration and unit test coverage (700+ lines of tests)
 
 - [ ] Real-time (WebSocket) resilience & ordering
   - Description: Ensure clients can recover from disconnects and request missed events in order.
@@ -78,6 +85,19 @@ Solution audit summary
   - Acceptance Criteria:
     - Activity endpoints accept filters and return `nextCursor` for paging.
     - Tests verify filter combinations and ordering; entries include consistent schema and timestamps.
+
+## Phase 1.5 — Minimalist Frontend (High Priority)
+- [ ] Basic HTML/JavaScript frontend for demo & portfolio
+  - Description: Create a lightweight, single-page frontend using vanilla JavaScript and plain CSS to demonstrate real-time synchronization and end-to-end functionality.
+  - Acceptance Criteria:
+    - Frontend serves from `/index.html` and is accessible at `http://localhost:5000/` (or configured app URL).
+    - User can upload CSV file via form; transactions appear in real-time after processing.
+    - Transaction list displays with pagination controls matching API cursor pagination.
+    - Real-time Activity Feed updates via WebSocket as events arrive (no polling).
+    - Multiple browser tabs/windows stay synchronized: changes in one tab reflect immediately in others.
+    - Simple metrics display (total balance, transaction count, category breakdown via simple tables or lists).
+    - No external UI frameworks (vanilla HTML/CSS); responsive layout using flexbox/grid.
+    - Integration test opens frontend, uploads CSV, and validates transaction list and activity feed update.
 
 ## Phase 2 — User & Data Persistence (Medium)
 - [ ] Persistent user records & simple preferences

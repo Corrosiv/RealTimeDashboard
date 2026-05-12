@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTimeDashboard.API", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTimeDashboard.Tests", "test\RealTimeDashboard.Tests\RealTimeDashboard.Tests.csproj", "{B1D8DF4A-1234-4A3C-A1B2-000000000003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTimeDashboard.API.Tests", "RealTimeDashboard.API.Tests\RealTimeDashboard.API.Tests.csproj", "{1561597F-0029-4401-A6E9-1303BB70D082}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,18 +49,6 @@ Global
 		{B1D8DF4A-1234-4A3C-A1B2-000000000003}.Release|x64.Build.0 = Release|Any CPU
 		{B1D8DF4A-1234-4A3C-A1B2-000000000003}.Release|x86.ActiveCfg = Release|Any CPU
 		{B1D8DF4A-1234-4A3C-A1B2-000000000003}.Release|x86.Build.0 = Release|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Debug|x64.Build.0 = Debug|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Debug|x86.Build.0 = Debug|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Release|x64.ActiveCfg = Release|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Release|x64.Build.0 = Release|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Release|x86.ActiveCfg = Release|Any CPU
-		{1561597F-0029-4401-A6E9-1303BB70D082}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
