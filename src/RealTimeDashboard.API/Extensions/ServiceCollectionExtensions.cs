@@ -38,6 +38,11 @@ public static class ServiceCollectionExtensions
 
         // Transaction API services
         services.AddScoped<TransactionQueryService>();
+
+        // Activity Feed API services
+        services.AddScoped<ActivityFeedQueryService>();
+
+        // Shared utilities
         services.AddScoped<CursorService>();
         services.AddScoped<RequestCanonicalizationService>();
 

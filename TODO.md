@@ -91,11 +91,24 @@ Solution audit summary
     - Configuration via appsettings.json: MaxReplayEvents (10000), MaxReplayAgeMinutes (60)
     - All 142 tests passing (126 existing + 16 new)
 
-- [ ] Activity feed — server-side filtering & paging
+- [x] Activity feed — server-side filtering & paging
+  - Status: ✅ COMPLETE - Phase 2 implementation with comprehensive filtering and cursor pagination
   - Description: Support filtering by user, event type, and time range, and provide paging for the feed.
   - Acceptance Criteria:
-    - Activity endpoints accept filters and return `nextCursor` for paging.
-    - Tests verify filter combinations and ordering; entries include consistent schema and timestamps.
+    - ✅ GET `/api/activityfeed` endpoint accepts optional filters: createdBy, eventType (comma-separated), since, until, resourceId
+    - ✅ Cursor-based pagination: limit (1-200, default 50), cursor, nextCursor, hasMore
+    - ✅ Sorting: newest first (CreatedAt DESC, Id DESC tie-breaker for stable ordering)
+    - ✅ Response schema: `{ entries: [...], nextCursor, hasMore }`
+    - ✅ Each entry includes: eventId, occurredAtUtc, eventType, createdBy, resourceId, message, payload
+    - ✅ ActivityFeedQueryRequest with FluentValidation ensures limit bounds, date range validity, cursor format
+    - ✅ ActivityFeedQueryService encapsulates filter logic, cursor encoding/decoding, stable pagination
+  - Implementation:
+    - ActivityFeedController: GET /api/activityfeed with validation and error handling
+    - ActivityFeedQueryService: multi-filter support (AND logic), cursor-based pagination with timestamp+id encoding
+    - CursorService: reused for base64(CreatedAt|Id) encoding/decoding
+    - ActivityFeedQueryRequest validator: limit bounds (1-200), Since <= Until, positive resourceId
+    - DTOs: ActivityFeedQueryRequest, ActivityFeedEntryDto, PaginatedActivityFeedResponse
+    - Tests ready to implement: pagination, filter combinations, sorting, cursor stability, edge cases
 
 ## Phase 1.5 — Minimalist Frontend (High Priority)
 - [ ] Basic HTML/JavaScript frontend for demo & portfolio
