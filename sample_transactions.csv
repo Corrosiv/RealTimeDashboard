@@ -1,0 +1,21 @@
+timestamp,amount,description,categoryId,createdBy,currency,source
+2026-01-15T08:30:00Z,50.00,Grocery shopping,1,Alice,USD,Manual
+2026-01-15T09:15:00Z,-25.50,Refund - Defective item,1,Alice,USD,Manual
+2026-01-15T10:45:00Z,120.00,Utility bill payment,2,Alice,USD,Manual
+2026-01-15T11:20:00Z,35.75,Coffee and lunch,3,Alice,USD,Manual
+2026-01-15T14:00:00Z,500.00,Monthly rent,4,Alice,USD,Manual
+2026-01-15T15:30:00Z,85.00,Gas station,2,Alice,USD,Manual
+2026-01-15T16:45:00Z,42.30,Restaurant dinner,3,Alice,USD,Manual
+2026-01-15T18:00:00Z,15.99,Movie tickets,5,Alice,USD,Manual
+2026-01-16T09:00:00Z,200.00,Gym membership,6,Bob,USD,Manual
+2026-01-16T10:30:00Z,60.00,Groceries,1,Bob,USD,Manual
+2026-01-16T12:00:00Z,25.50,Lunch,3,Bob,USD,Manual
+2026-01-16T14:15:00Z,150.00,New phone case,7,Bob,USD,Manual
+2026-01-16T16:45:00Z,45.00,Gas station,2,Bob,USD,Manual
+2026-01-16T18:30:00Z,80.00,Dinner out,3,Bob,USD,Manual
+2026-01-17T08:30:00Z,100.00,Office supplies,8,Charlie,USD,Manual
+2026-01-17T10:00:00Z,55.00,Groceries,1,Charlie,USD,Manual
+2026-01-17T11:30:00Z,30.00,Breakfast,3,Charlie,USD,Manual
+2026-01-17T13:00:00Z,200.00,Car insurance,9,Charlie,USD,Manual
+2026-01-17T15:00:00Z,65.00,Pharmacy,10,Charlie,USD,Manual
+2026-01-17T17:00:00Z,90.00,Restaurant,3,Charlie,USD,Manual

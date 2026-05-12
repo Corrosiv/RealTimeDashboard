@@ -1,0 +1,12 @@
+timestamp,amount,description,categoryId,createdBy,currency
+2026-01-22T09:00:00Z,100.00,Normal transaction,1,User1,USD
+2026-01-22T10:00:00Z,-50.00,Refund transaction,1,User1,USD
+2026-01-22T11:00:00Z,0.01,Tiny amount,1,User1,USD
+2026-01-22T12:00:00Z,9999.99,Large amount,2,User1,USD
+2026-01-22T13:00:00Z,150.00,"Description with, commas",3,User1,USD
+2026-01-22T14:00:00Z,75.50,"Description with
+newline",4,User1,USD
+2026-01-22T15:00:00Z,200.00,  Leading and trailing spaces  ,5,User1,USD
+2026-01-22T16:00:00Z,100.00,Café with special chars: é,1,ÜserNämé,USD
+2026-01-22T17:00:00Z,50.00,Transaction in EUR,2,User2,EUR
+2026-01-22T18:00:00Z,50.00,Transaction in gbp,2,User2,GBP
