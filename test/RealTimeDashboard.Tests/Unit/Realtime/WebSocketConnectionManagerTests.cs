@@ -136,7 +136,7 @@ public class WebSocketConnectionManagerTests
         // Assert
         var remaining = _manager.GetAll().ToList();
         Assert.Equal(3, remaining.Count);
-        Assert.False(remaining.Any(s => s.Key == "client-1"));
-        Assert.True(remaining.Any(s => s.Key == "client-new"));
+        Assert.DoesNotContain(remaining, s => s.Key == "client-1");
+        Assert.Contains(remaining, s => s.Key == "client-new");
     }
 }
